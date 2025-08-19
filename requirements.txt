@@ -1,0 +1,6 @@
+PyQt5
+PyQtWebEngine
+earthengine-api
+geemap
+folium
+json
