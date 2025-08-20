@@ -1,4 +1,4 @@
-# deforestation_tracking
+# Deforestation Tracker (Python 3.11) - Jude Peach
 A satellite image analysis tool used to highlight signs of possible deforestation sites in the rainforest.
 - This tool allows users to draw an area of interest (AOI) on the globe, and compute forest/vegetation loss signals using NDVI.
     - NDVI is the Normalized Difference Vegetation Index, a common index for measuring vegetation density from satellite images.
