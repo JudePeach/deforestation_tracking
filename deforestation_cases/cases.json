@@ -1,0 +1,17 @@
+[
+  {
+    "before_mean": 0.47938453551899246,
+    "after_mean": 0.4729406207064141,
+    "loss_area_ha": 1478.7907365848052,
+    "aoi": [
+      0.7401832682254795,
+      -59.77249145507813,
+      0.9310503305113318,
+      -59.62829589843751
+    ],
+    "start_year": 2022,
+    "end_year": 2024,
+    "out_html": "/Users/jude/GitRepos/deforestation_tracking/deforestation_cases/case_20250820_151603.html",
+    "id": "case_20250820_151603"
+  }
+]

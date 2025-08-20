@@ -38,7 +38,7 @@ from typing import Optional, Tuple
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal, QThread
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QPushButton, QVBoxLayout,
-    QTextEdit, QHBoxLayout, QSpinBox, QLabel, QProgressBar
+    QTextEdit, QHBoxLayout, QSpinBox, QLabel, QProgressBar, QStackedWidget
 )
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebChannel import QWebChannel
@@ -50,11 +50,17 @@ import folium
 from folium.plugins import Draw
 import geemap.foliumap as geemap
 
+import json, shutil, datetime
+
+CASES_DIR = os.path.join(os.getcwd(), "deforestation_cases")
+os.makedirs(CASES_DIR, exist_ok=True)
+CASES_FILE = os.path.join(CASES_DIR, "cases.json")
+
 # ------------------------------
 # Earth Engine init (ensure you've authenticated once via ee.Authenticate())
 # Note: calling Initialize inside the worker thread as well for thread-safety
 # ------------------------------
-ee.Initialize(project='YOUR_PROJECT_ID') # PLACE YOUR PROJECT ID HERE (keep this hidden!!!)
+ee.Initialize(project='1001479155259') # PLACE YOUR PROJECT ID HERE (keep this hidden!!!)
 
 # ------------------------------
 # Helpers for EE processing
@@ -156,7 +162,7 @@ class EEWorker(QObject):
             self._emit(2, "Initializing Earth Engine…")
             # Initialize in this thread as well (safer across threads)
             try:
-                ee.Initialize(project='YOUR_PROJECT_ID')
+                ee.Initialize(project='1001479155259')
             except Exception:
                 # In case already initialized or project param differs, try plain init
                 ee.Initialize()
@@ -301,13 +307,18 @@ class DeforestationApp(QWidget):
         self.bridge = Bridge()
         self.bridge.aoiChanged.connect(self.on_aoi_changed)
 
-        # UI Layout
-        root = QVBoxLayout(self)
+        # UI Layout - using stacks for handling seperate pages/views
+        self.stack = QStackedWidget()
+        root_layout = QVBoxLayout(self)
+        root_layout.addWidget(self.stack)
+        
+        self.main_page = QWidget()
+        root = QVBoxLayout(self.main_page)
 
-        # Controls row: years + compute
+         # Controls row: years + compute
         controls = QHBoxLayout()
         root.addLayout(controls)
-
+        
         controls.addWidget(QLabel("Start Year:"))
         self.start_year = QSpinBox()
         self.start_year.setRange(2016, 2035)
@@ -321,8 +332,17 @@ class DeforestationApp(QWidget):
         controls.addWidget(self.end_year)
 
         self.btn_compute = QPushButton("Compute Deforestation")
+        self.btn_save_case = QPushButton("Save this case")
+        self.btn_save_case.setEnabled(False)  # Initially disabled until computation is done
+        self.btn_save_case.clicked.connect(self.save_case)
         self.btn_compute.clicked.connect(self.compute_deforestation)
         controls.addWidget(self.btn_compute)
+        controls.addWidget(self.btn_save_case)
+
+        self.btn_cases = QPushButton("Open Cases")
+        self.btn_cases.clicked.connect(self.open_cases)
+        controls.addWidget(self.btn_cases)
+
 
         # Progress bar (determinate with text) - starts off hidden and becomes visible when computation starts
         self.progress = QProgressBar()
@@ -348,6 +368,8 @@ class DeforestationApp(QWidget):
 
         # Load the initial map that allows drawing an AOI
         self.load_selection_map()
+
+        self.stack.addWidget(self.main_page)
 
         # Threading members
         self.thread: Optional[QThread] = None
@@ -459,6 +481,91 @@ class DeforestationApp(QWidget):
 
         self.thread.start()
 
+    def open_cases(self):
+        """ Opens a new tab with a list of the open cases of possible deforestation
+            The user can click on each case to view the saved map and statistics linked to the aoi.
+            They can analyse cases and use machine learning to detect if they show deforestation.
+            From there they can report/raise the case.
+            """
+        # Create a new QWidget for the cases tab
+        self.cases_page = QWidget()
+        layout = QVBoxLayout(self.cases_page)
+
+        # Add a back button
+        back_btn = QPushButton("← Back")
+        layout.addWidget(back_btn)
+
+        # Add a placeholder for cases list
+        cases_label = QLabel("Open Cases:")
+        layout.addWidget(cases_label)
+
+        if os.path.exists(CASES_FILE):
+            with open(CASES_FILE, "r") as f:
+                cases = json.load(f)
+        else:
+            cases = []
+        
+        if len(cases) == 0:
+            cases_label.setText("No cases saved yet. Compute a deforestation case first.")
+            return
+        else:
+            for case in cases:
+                btn = QPushButton(
+                f"{case['id']} | {case['start_year']}–{case['end_year']} | Loss: {case['loss_area_ha']:.2f} ha"
+                )
+                layout.addWidget(btn)
+
+                def open_case(*args, case=case):
+                    self.stats.setText(
+                        f"AOI: {case['aoi']}\n"
+                        f"Time Period: {case['start_year']} – {case['end_year']}\n"
+                        f"NDVI Before: {case['before_mean']:.3f}\n"
+                        f"NDVI After: {case['after_mean']:.3f}\n"
+                        f"Forest Loss: {case['loss_area_ha']:.2f} ha"
+                    )
+                    self.map_view.load(QUrl.fromLocalFile(case["out_html"]))
+                    self.stack.setCurrentWidget(self.main_page)
+
+                btn.clicked.connect(open_case)
+
+        if self.stack.indexOf(self.cases_page) == -1:
+            self.stack.addWidget(self.cases_page)
+        self.stack.setCurrentWidget(self.cases_page)
+
+        back_btn.clicked.connect(lambda: self.stack.setCurrentWidget(self.main_page))
+
+    def save_case(self):
+        """ Saves the current case with the AOI, years, and results to a file.
+            This is a placeholder function that can be expanded to save to a database or file system.
+            """
+        if not hasattr(self, "last_results") or not self.last_results:
+            self.stats.setText("⚠️ No results to save. Please compute first.")
+            return
+        
+        results = self.last_results
+
+        # Copy the map HTML to permanent storage
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        case_id = f"case_{timestamp}"
+        map_path = os.path.join(CASES_DIR, f"{case_id}.html")
+        shutil.copy(results["out_html"], map_path)
+        results["out_html"] = map_path
+        results["id"] = case_id
+
+        # Load existing cases
+        if os.path.exists(CASES_FILE):
+            with open(CASES_FILE, "r") as f:
+                cases = json.load(f)
+        else:
+            cases = []
+
+        cases.append(results)
+        
+        # Save updated cases
+        with open(CASES_FILE, "w") as f:
+            json.dump(cases, f, indent=2)
+
+        self.stats.setText(f"✅ Case saved: {case_id}")
     # --------------------------
     # Worker callbacks
     # --------------------------
@@ -468,7 +575,12 @@ class DeforestationApp(QWidget):
         QApplication.processEvents()
 
     def on_computation_done(self, results: dict):
+
+        #Persist the results (so they can be saved if needed)
+        self.last_results = results
+
         self.btn_compute.setEnabled(True)
+        self.btn_save_case.setEnabled(True)
         self.progress.setVisible(False)
 
         def fmt(x, nd=3):
