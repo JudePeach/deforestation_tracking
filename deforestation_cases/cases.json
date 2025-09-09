@@ -13,5 +13,35 @@
     "end_year": 2024,
     "out_html": "/Users/jude/GitRepos/deforestation_tracking/deforestation_cases/case_20250820_151603.html",
     "id": "case_20250820_151603"
+  },
+  {
+    "before_mean": 0.43412190522643457,
+    "after_mean": 0.45701843570437634,
+    "loss_area_ha": 3.098147434776157,
+    "aoi": [
+      -6.509597500724238,
+      -58.40967178344727,
+      -6.495611824360094,
+      -58.39422225952149
+    ],
+    "start_year": 2022,
+    "end_year": 2025,
+    "out_html": "/Users/jude/GitRepos/deforestation_tracking/deforestation_cases/case_20250822_150947.html",
+    "id": "case_20250822_150947"
+  },
+  {
+    "before_mean": 0.4127103166248662,
+    "after_mean": 0.3842033247218423,
+    "loss_area_ha": 35.78615312353994,
+    "aoi": [
+      -6.5085315329969795,
+      -58.40915679931641,
+      -6.493948867456231,
+      -58.39508056640625
+    ],
+    "start_year": 2022,
+    "end_year": 2024,
+    "out_html": "/Users/jude/GitRepos/deforestation_tracking/deforestation_cases/case_20250822_151149.html",
+    "id": "case_20250822_151149"
   }
 ]
