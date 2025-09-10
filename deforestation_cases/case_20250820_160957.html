@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_b3f48ed8ba85fc8e828fd22cf9d8bba8 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.2/leaflet.draw.css"/>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+</head>
+<body>
+    
+    
+            <div style='position: fixed; bottom: 50px; left: 50px; width: 220px; height: 30px;
+                        background: linear-gradient(to right, white, lightgreen, green, darkgreen);
+                        border: 2px solid grey; z-index:9999; font-size:14px;'>
+              <div style='display:flex; justify-content:space-between; padding:0 5px;'>
+                <span>0</span><span>0.2</span><span>0.4</span><span>0.6</span><span>0.8</span><span>1</span>
+              </div>
+            </div>
+            
+    
+            <div class="folium-map" id="map_b3f48ed8ba85fc8e828fd22cf9d8bba8" ></div>
+        
+    
+            
+        
+</body>
+<script>
+    
+    
+            var map_b3f48ed8ba85fc8e828fd22cf9d8bba8 = L.map(
+                "map_b3f48ed8ba85fc8e828fd22cf9d8bba8",
+                {
+                    center: [-6.755908516770942, -62.99697875976563],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 8,
+  "zoomControl": true,
+  "preferCanvas": false,
+  "basemap": "SATELLITE",
+  "eeInitialize": true,
+  "pluginLatlngpopup": false,
+  "pluginFullscreen": true,
+  "pluginDraw": true,
+  "DrawExport": false,
+  "pluginMinimap": false,
+  "locateControl": false,
+  "searchControl": true,
+  "layersControl": true,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_d9c2c7089f8dd39ada47dae529eac985 = L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 30,
+  "maxNativeZoom": 30,
+  "noWrap": false,
+  "attribution": "Esri",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_d9c2c7089f8dd39ada47dae529eac985.addTo(map_b3f48ed8ba85fc8e828fd22cf9d8bba8);
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_b3f48ed8ba85fc8e828fd22cf9d8bba8);
+        
+    
+            var options = {
+              position: "topleft",
+              draw: {},
+              edit: {},
+            }
+                // FeatureGroup is to store editable layers.
+                var drawnItems_draw_control_5665a3121ee125c9817ae25f6a295946 =
+                    new L.featureGroup().addTo(
+                        map_b3f48ed8ba85fc8e828fd22cf9d8bba8
+                    );
+
+            options.edit.featureGroup = drawnItems_draw_control_5665a3121ee125c9817ae25f6a295946;
+            var draw_control_5665a3121ee125c9817ae25f6a295946 = new L.Control.Draw(
+                options
+            ).addTo( map_b3f48ed8ba85fc8e828fd22cf9d8bba8 );
+            map_b3f48ed8ba85fc8e828fd22cf9d8bba8.on(L.Draw.Event.CREATED, function(e) {
+                var layer = e.layer,
+                    type = e.layerType;
+                var coords = JSON.stringify(layer.toGeoJSON());
+                layer.on('click', function() {
+                    alert(coords);
+                    console.log(coords);
+                });
+                drawnItems_draw_control_5665a3121ee125c9817ae25f6a295946.addLayer(layer);
+            });
+            map_b3f48ed8ba85fc8e828fd22cf9d8bba8.on('draw:created', function(e) {
+                drawnItems_draw_control_5665a3121ee125c9817ae25f6a295946.addLayer(e.layer);
+            });
+
+            
+        
+    
+
+            var geocoderOpts_geocoder_df80c1148c6f660b1e83c2f4087bf8ac = {
+  "collapsed": true,
+  "position": "topleft",
+  "defaultMarkGeocode": true,
+  "zoom": 11,
+  "provider": "nominatim",
+  "providerOptions": {
+},
+};
+
+            // note: geocoder name should start with lowercase
+            var geocoderName_geocoder_df80c1148c6f660b1e83c2f4087bf8ac = geocoderOpts_geocoder_df80c1148c6f660b1e83c2f4087bf8ac["provider"];
+
+            var customGeocoder_geocoder_df80c1148c6f660b1e83c2f4087bf8ac = L.Control.Geocoder[ geocoderName_geocoder_df80c1148c6f660b1e83c2f4087bf8ac ](
+                geocoderOpts_geocoder_df80c1148c6f660b1e83c2f4087bf8ac['providerOptions']
+            );
+            geocoderOpts_geocoder_df80c1148c6f660b1e83c2f4087bf8ac["geocoder"] = customGeocoder_geocoder_df80c1148c6f660b1e83c2f4087bf8ac;
+
+            L.Control.geocoder(
+                geocoderOpts_geocoder_df80c1148c6f660b1e83c2f4087bf8ac
+            ).on('markgeocode', function(e) {
+                var zoom = geocoderOpts_geocoder_df80c1148c6f660b1e83c2f4087bf8ac['zoom'] || map_b3f48ed8ba85fc8e828fd22cf9d8bba8.getZoom();
+                map_b3f48ed8ba85fc8e828fd22cf9d8bba8.setView(e.geocode.center, zoom);
+            }).addTo(map_b3f48ed8ba85fc8e828fd22cf9d8bba8);
+
+        
+    
+            map_b3f48ed8ba85fc8e828fd22cf9d8bba8.fitBounds(
+                [[-6.755908516770942, -62.99697875976563], [-6.755908516770942, -62.99697875976563]],
+                {"maxZoom": 8}
+            );
+        
+    
+            var tile_layer_25a4bf6bcf1efd60d6928eeaf326fc30 = L.tileLayer(
+                "https://earthengine.googleapis.com/v1/projects/1001479155259/maps/f7696745a44ea638cfb4b5a0c936eb99-a07ffc752903bd48f900f9b6259829a2/tiles/{z}/{x}/{y}",
+                {
+  "minZoom": 0,
+  "maxZoom": 24,
+  "maxNativeZoom": 24,
+  "noWrap": false,
+  "attribution": "Google Earth Engine",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1.0,
+}
+
+            );
+        
+    
+            tile_layer_25a4bf6bcf1efd60d6928eeaf326fc30.addTo(map_b3f48ed8ba85fc8e828fd22cf9d8bba8);
+        
+    
+            var tile_layer_e5d3be7a58bdc06c1303691f3122acc1 = L.tileLayer(
+                "https://earthengine.googleapis.com/v1/projects/1001479155259/maps/2ca9b4f07da8dc63edbb3ea9a9fa702f-86cd02ca7c147fd6ee1e1d7e1d22b15c/tiles/{z}/{x}/{y}",
+                {
+  "minZoom": 0,
+  "maxZoom": 24,
+  "maxNativeZoom": 24,
+  "noWrap": false,
+  "attribution": "Google Earth Engine",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1.0,
+}
+
+            );
+        
+    
+            var tile_layer_469aa1ea6349242f680f30624c1f01bc = L.tileLayer(
+                "https://earthengine.googleapis.com/v1/projects/1001479155259/maps/0dda78f227803d4284be25d97dc3e509-b137359a20ef552da72cc54c490078ed/tiles/{z}/{x}/{y}",
+                {
+  "minZoom": 0,
+  "maxZoom": 24,
+  "maxNativeZoom": 24,
+  "noWrap": false,
+  "attribution": "Google Earth Engine",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1.0,
+}
+
+            );
+        
+    
+            var tile_layer_c4f90e88c3d1597d7f529f0a72f8a94c = L.tileLayer(
+                "https://earthengine.googleapis.com/v1/projects/1001479155259/maps/49be3e112bc63cfda43f6e3a20c96f6c-d29cfde76f293e6b93c3e9976696c424/tiles/{z}/{x}/{y}",
+                {
+  "minZoom": 0,
+  "maxZoom": 24,
+  "maxNativeZoom": 24,
+  "noWrap": false,
+  "attribution": "Google Earth Engine",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1.0,
+}
+
+            );
+        
+    
+            var tile_layer_4a597250fe467d6f40c56320806d79db = L.tileLayer(
+                "https://earthengine.googleapis.com/v1/projects/1001479155259/maps/3ee2c6aff53cb8d47872a97e0ccef5f2-f95fc289b1468a689e5e042b6c7b5722/tiles/{z}/{x}/{y}",
+                {
+  "minZoom": 0,
+  "maxZoom": 24,
+  "maxNativeZoom": 24,
+  "noWrap": false,
+  "attribution": "Google Earth Engine",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1.0,
+}
+
+            );
+        
+    
+            tile_layer_4a597250fe467d6f40c56320806d79db.addTo(map_b3f48ed8ba85fc8e828fd22cf9d8bba8);
+        
+    
+            var tile_layer_eaeb6e97a901254b674d77a9f6a2623f = L.tileLayer(
+                "https://earthengine.googleapis.com/v1/projects/1001479155259/maps/ff6b4a367b71fe15970a2c3499c60e05-b7c608efbc4d7d53470ac3315fa5cb32/tiles/{z}/{x}/{y}",
+                {
+  "minZoom": 0,
+  "maxZoom": 24,
+  "maxNativeZoom": 24,
+  "noWrap": false,
+  "attribution": "Google Earth Engine",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1.0,
+}
+
+            );
+        
+    
+            tile_layer_eaeb6e97a901254b674d77a9f6a2623f.addTo(map_b3f48ed8ba85fc8e828fd22cf9d8bba8);
+        
+    
+            var layer_control_f2f02e3297c2e3e2c076a91de7ed7288_layers = {
+                base_layers : {
+                },
+                overlays :  {
+                    "Esri.WorldImagery" : tile_layer_d9c2c7089f8dd39ada47dae529eac985,
+                    "Satellite After" : tile_layer_25a4bf6bcf1efd60d6928eeaf326fc30,
+                    "Satellite Before" : tile_layer_e5d3be7a58bdc06c1303691f3122acc1,
+                    "NDVI Before" : tile_layer_469aa1ea6349242f680f30624c1f01bc,
+                    "NDVI After" : tile_layer_c4f90e88c3d1597d7f529f0a72f8a94c,
+                    "Deforestation (NDVI drop \u003e 0.1)" : tile_layer_4a597250fe467d6f40c56320806d79db,
+                    "AOI Outline" : tile_layer_eaeb6e97a901254b674d77a9f6a2623f,
+                },
+            };
+            let layer_control_f2f02e3297c2e3e2c076a91de7ed7288 = L.control.layers(
+                layer_control_f2f02e3297c2e3e2c076a91de7ed7288_layers.base_layers,
+                layer_control_f2f02e3297c2e3e2c076a91de7ed7288_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_b3f48ed8ba85fc8e828fd22cf9d8bba8);
+
+        
+</script>
+</html>
