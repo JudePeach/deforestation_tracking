@@ -4,3 +4,7 @@ earthengine-api
 geemap
 folium
 json
+scikit-learn
+pandas
+joblib
+numpy

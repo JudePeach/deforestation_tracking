@@ -54,6 +54,14 @@ import json, shutil, datetime
 
 import random
 
+# joblib to import my ML model
+import joblib
+import pandas as pd
+import numpy as np
+
+CLASSIFIER = joblib.load("deforestation_model.pkl")
+SCALER = joblib.load("scaler.pkl")
+
 CASES_DIR = os.path.join(os.getcwd(), "deforestation_cases")
 os.makedirs(CASES_DIR, exist_ok=True)
 CASES_FILE = os.path.join(CASES_DIR, "cases.json")
@@ -594,12 +602,32 @@ class DeforestationApp(QWidget):
                 return "N/A"
 
         min_lat, min_lon, max_lat, max_lon = results["aoi"]
+        
+        # Prep feats for the ML model:
+        aoi_area_ha = (abs(max_lat - min_lat) * abs(max_lon - min_lon)) * 111 * 111
+        diff_mean = (results["after_mean"] or 0) - (results["before_mean"] or 0)
+
+        aoi_dict = {
+                "before_mean": results["before_mean"],
+                "after_mean": results["after_mean"],
+                "loss_area_ha": results["loss_area_ha"],
+                "aoi_area_ha": aoi_area_ha,
+                "diff_mean": diff_mean
+                }
+
+        try:
+            prediction = predict_deforestation(aoi_dict)
+            pred_text = "🌲 Likely Deforestation" if prediction == 1 else "✅ No Significant Deforestation"
+        except Exception as e:
+            pred_text = f"PREDICTION ERROR: {e}"
+
         self.stats.setText(
             f"AOI: ({min_lat:.6f}, {min_lon:.6f}) → ({max_lat:.6f}, {max_lon:.6f})\n"
             f"Time Period: {results['start_year']} – {results['end_year']}\n"
             f"NDVI Before: {fmt(results['before_mean'])}\n"
             f"NDVI After:  {fmt(results['after_mean'])}\n"
             f"Forest Loss: {results['loss_area_ha']:.2f} ha\n\n"
+            f"ML Prediction: {pred_text}\n\n"
             "NDVI guide:\n"
             "  0.8–1.0: very dense vegetation\n"
             "  0.6–0.8: healthy vegetation\n"
@@ -616,6 +644,24 @@ class DeforestationApp(QWidget):
         self.progress.setVisible(False)
         self.stats.setText(f"❌ Error: {msg}")
 
+def predict_deforestation(aoi_dict):
+    """
+        Takes in an aoi dict with stats about the aoi and uses ML to predict deforestation.
+    """
+    df = pd.DataFrame([aoi_dict])
+
+    # Add our engineered features the model needs
+    df["diff_weighted"] = df["diff_mean"] * np.log1p(df["aoi_area_ha"])
+    df["diff_area_interaction"] = df["diff_mean"] * df["aoi_area_ha"]
+
+    # make sure cols are in same order as in our training
+    df = df.reindex(columns=X.columns, fill_value=0)
+
+    # Scale and predict
+    df_scaled = SCALER.transform(df)
+    prediction = CLASSIFIER.predict(df_scaled)
+
+    return prediction[0]
 
 def run_aoi_ml(min_lat, min_lon, max_lat, max_lon):
 
@@ -755,7 +801,11 @@ def run_aoi_ml(min_lat, min_lon, max_lat, max_lon):
         print(e)
 
     return results
+
 def random_aoi(size_deg=0.1):
+    """ 
+        Computes a random area of interest for processing for our training data.
+    """
     # Lat/lon ranges roughly in high deforestation areas
     lat_range = (-9, -3)      # hotspots in Amazonas, Mato Grosso
     lon_range = (-65, -55)    # western Brazil
